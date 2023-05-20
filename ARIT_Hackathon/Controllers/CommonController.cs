@@ -18,12 +18,15 @@ using System.Net.Http;
 using System.Dynamic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 
 namespace ARIT_Hackathon.Controllers
 {
     //[BasicAuthorize]
+    [ApiController]
     [Route("api/[controller]")]
-    public class CommonController : Controller
+    public class CommonController : ControllerBase
     {
         private ILoggerManager _logger;
         private IRepositoryWrapper _repoWrapper;        
