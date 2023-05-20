@@ -1,2 +1,5 @@
 dotnet tool install --global dotnet-ef
 dotnet ef dbcontext scaffold "Host=localhost;Database=grievance_preprod;Username=postgres;Password=1234" Npgsql.EntityFrameworkCore.PostgreSQL --context RepositoryContext -o Models/ --context-dir "E:\Projects\ARIT_Hackathon\ARIT_Hackathon\Entities" -f --schema public
+
+dotnet ef dbcontext scaffold "Host=localhost;Database=grievance_preprod;Username=postgres;Password=1234" Npgsql.EntityFrameworkCore.PostgreSQL --context RepositoryContext -o Models/ --context-dir "E:\Projects\ARIT_Hackathon\ARIT_Hackathon\Entities" --use-database-names --no-onconfiguring --no-pluralize  -f --schema public
+
