@@ -9,6 +9,8 @@ using Entities.Models;
 using System;
 using Newtonsoft.Json;
 using System.Linq;
+using System.Collections.Generic;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ARIT_Hackathon.Controllers
 {
@@ -319,14 +321,15 @@ namespace ARIT_Hackathon.Controllers
                 {
                     return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Mode Required!", showMsg = true });
                 }
-                
 
-                if (payload.user_id_ref==0 || !_context.user_details.AsNoTracking().Any(x=>x.transid== payload.user_id_ref && x.pan.ToUpper()==payload.pan))
+
+                if (payload.user_id_ref == 0 || !_context.user_details.AsNoTracking().Any(x => x.transid == payload.user_id_ref && x.pan.ToUpper() == payload.pan))
                 {
                     return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Invalid user_id_ref!", showMsg = true });
                 }
 
-                if (payload.issue_id != 0 && !_context.issue_detail.AsNoTracking().Any(x => x.issue_id == payload.issue_id && x.pan != payload.pan)) {
+                if (payload.issue_id != 0 && !_context.issue_detail.AsNoTracking().Any(x => x.issue_id == payload.issue_id && x.pan != payload.pan))
+                {
                     return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "issue_id is already registered on another pan!", showMsg = true });
                 }
                 payload.targate_date = (payload.targate_date ?? payload.targate_date.Value.AddDays(5));
@@ -334,17 +337,19 @@ namespace ARIT_Hackathon.Controllers
 
 
 
-                if (payload.issue_id == 0) {
+                if (payload.issue_id == 0)
+                {
                     _context.Add(payload);
                     _context.SaveChanges();
                     _context.Entry(payload).State = EntityState.Detached;
                 }
-                else {
+                else
+                {
                     _context.Entry(payload).State = EntityState.Modified;
                     _context.SaveChanges();
                     _context.Entry(payload).State = EntityState.Detached;
                 }
-                return  Ok(new ApiCommonResponse<issue_detail>() { allowStatus = true, msg = "Successfully issue registered!", showMsg = true , contentData= payload});
+                return Ok(new ApiCommonResponse<issue_detail>() { allowStatus = true, msg = "Successfully issue registered!", showMsg = true, contentData = payload });
 
             }
             catch (Exception ex)
@@ -360,28 +365,134 @@ namespace ARIT_Hackathon.Controllers
         {
             try
             {
-                
-               if(issueListPayLoad.Status !=null && issueListPayLoad.UserId ==null && issueListPayLoad.IssueId ==null && issueListPayLoad.IssueCretedBy == null)
+                var data = _context.issue_detail.AsNoTracking().Where(x => (string.IsNullOrWhiteSpace(issueListPayLoad.Status) || x.status == issueListPayLoad.Status)
+                && (string.IsNullOrWhiteSpace(issueListPayLoad.IssueCreatedBy) || x.issue_by == issueListPayLoad.IssueCreatedBy)
+                && (string.IsNullOrWhiteSpace(issueListPayLoad.Summary) || x.summary == issueListPayLoad.Summary)
+                && (issueListPayLoad.IssueId == null || x.issue_id == issueListPayLoad.IssueId)
+                && (issueListPayLoad.UserId == null || x.issue_id == issueListPayLoad.UserId)).ToList();
+
+                if (data == null || data.Count == 0)
                 {
-                    var data =_context.issue_detail.AsNoTracking<>.Where(x=>x.)
+                    return Ok(new ApiCommonResponse<List<issue_detail>>() { allowStatus = false, msg = "No records found!", showMsg = true });
                 }
-
-
-
-                
+                else
+                {
+                    return Ok(new ApiCommonResponse<List<issue_detail>>() { allowStatus = true, contentData = data, showMsg = false });
+                }
             }
             catch (Exception)
             {
 
-                throw;
+                return Ok(new ApiCommonResponse<List<issue_detail>>() { allowStatus = false, msg = "Something went wrong!", showMsg = true });
             }
 
         }
 
+        [Route("getDropDownValue")]
+        [HttpGet]
+        public IActionResult getDropDownValue()
+        {
+            try
+            {
+                var data = _context.cfg_codevalue.ToList();
+
+                if (data == null || data.Count == 0)
+                {
+                    return Ok(new ApiCommonResponse<List<cfg_codevalue>>() { allowStatus = false, msg = "No records found!", showMsg = true });
+                }
+                else
+                {
+                    return Ok(new ApiCommonResponse<List<cfg_codevalue>>() { allowStatus = true, contentData = data, showMsg = false });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ApiCommonResponse<List<cfg_codevalue>>() { allowStatus = false, msg = "Something went wrong!", showMsg = true });
+                throw;
+            }
+        }
+
+        [Route("AddNewNotes")]
+        [HttpPost]
+        public IActionResult AddnewNote([FromBody] issue_notes_detail issue_Notes)
+        {
+            try
+            {
+                if (issue_Notes == null)
+                {
+                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
+                }
+                else if (issue_Notes.issue_id_ref == 0)
+                {
+                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "issue id required!", showMsg = true });
+                }
+                else if (issue_Notes.user_id_ref == 0)
+                {
+                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "user id required!", showMsg = true });
+                }
+                else if (!_context.issue_detail.AsNoTracking().Any(x => x.issue_id == issue_Notes.issue_id_ref))
+                {
+                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "issue id is invalid!", showMsg = true });
+                }
+                else if (!_context.user_details.AsNoTracking().Any(x => x.transid == issue_Notes.user_id_ref))
+                {
+                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "user id is invalid!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(issue_Notes.note) && string.IsNullOrWhiteSpace(issue_Notes.filename) && string.IsNullOrWhiteSpace(issue_Notes.filedata))
+                {
+                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "atleast a one field is requird note attachment or note text !", showMsg = true });
+                }
+                issue_Notes.created_dt = System.DateTime.Now;
+                issue_Notes.created_by = _context.user_details.AsNoTracking().Where(x => x.transid == issue_Notes.user_id_ref).Select(o => o.fullname).FirstOrDefault();
 
 
+                _context.Add(issue_Notes);
+                _context.SaveChanges();
+                _context.Entry(issue_Notes).State = EntityState.Detached;
+
+                return Ok(new ApiCommonResponse<string>() { allowStatus = true, msg = "Successfully issue registered!", showMsg = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
+                return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+            }
+        }
 
 
+        [Route("GetNotes/{issueId}")]
+        [HttpGet]
+        public IActionResult GetNotesList(long issueId)
+        {
+            long id = issueId;
+            try
+            {// else if(!_context.issue_detail.AsNoTracking())
+                if (id == 0)
+                {
+                    return BadRequest(new ApiCommonResponse<List<issue_notes_detail>>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
+                }
+                else if (!_context.issue_detail.AsNoTracking().Any(x => x.issue_id == id))
+                {
+                    return BadRequest(new ApiCommonResponse<List<issue_notes_detail>>() { allowStatus = false, msg = "Invalid issue id!", showMsg = true });
+                }
 
+
+                List<issue_notes_detail> data = _context.issue_notes_detail.AsNoTracking().Where(x => x.issue_id_ref == id).ToList();
+
+                if (data == null || data.Count == 0)
+                {
+                    return BadRequest(new ApiCommonResponse<List<issue_notes_detail>>() { allowStatus = true, msg = "no data found!", showMsg = false });
+                }
+                else
+                {
+                    return Ok(new ApiCommonResponse<List<issue_notes_detail>>() { allowStatus = true, msg = "Successfully issue note Get!", showMsg = false, contentData = data });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
+                return Ok(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+            }
+        }
     }
 }

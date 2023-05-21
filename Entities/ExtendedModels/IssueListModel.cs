@@ -8,13 +8,13 @@ namespace Entities.ExtendedModels
 {
     public class IssueListModel
     {
-        public long  IssueId { get; set; }
-        public long UserId { get; set; }
+        public long? IssueId { get; set; }
+        public long? UserId { get; set; }
 
         public string Status { get; set; }
-        public string IssueCretedBy { get; set; }
+        public string IssueCreatedBy { get; set; }
 
-        //public string MyProperty { get; set; }
+        public string Summary { get; set; }
 
 
     }
