@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Interfaces;
 using LoggerService;
 using Repository;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Builder;
 
 namespace ARIT_Hackathon.Extentions
 {

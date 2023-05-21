@@ -8,6 +8,7 @@ using Entities.ExtendedModels;
 using Entities.Models;
 using System;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace ARIT_Hackathon.Controllers
 {
@@ -261,8 +262,6 @@ namespace ARIT_Hackathon.Controllers
             }
         }
 
-
-
         [Route("RegisterIssue")]
         [HttpPost]
         public IActionResult RegisterIssue([FromBody] issue_detail payload)
@@ -354,6 +353,35 @@ namespace ARIT_Hackathon.Controllers
                 return Ok(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
             }
         }
+
+        [Route("GetIssueList")]
+        [HttpPost]
+        public IActionResult GetIssueList([FromBody] IssueListModel issueListPayLoad)
+        {
+            try
+            {
+                
+               if(issueListPayLoad.Status !=null && issueListPayLoad.UserId ==null && issueListPayLoad.IssueId ==null && issueListPayLoad.IssueCretedBy == null)
+                {
+                    var data =_context.issue_detail.AsNoTracking<>.Where(x=>x.)
+                }
+
+
+
+                
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+
+        }
+
+
+
+
+
 
     }
 }
