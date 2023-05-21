@@ -23,7 +23,9 @@ public partial class user_login
 
     public string? ip_address { get; set; }
 
-    public DateTime? expirey_dt { get; set; }
+    public DateTime? expiry_dt { get; set; }
 
     public string roletype { get; set; } = null!;
+
+    public long user_id_ref { get; set; }
 }

@@ -36,7 +36,7 @@ namespace ARIT_Hackathon.Controllers
         {
             string Pan = "AXGPT8163J";
             _logger.LogInfo($"Fetch all process start");
-            var userData = _context.user_login.AsNoTracking().Where(x => Pan == Pan.ToUpper() && (x.expirey_dt == null || x.expirey_dt > DateTime.Now)).FirstOrDefault();
+            var userData = _context.user_login.AsNoTracking().Where(x => Pan == Pan.ToUpper() && (x.expiry_dt == null || x.expiry_dt > DateTime.Now)).FirstOrDefault();
             return Ok(userData);
         }
 
@@ -61,7 +61,7 @@ namespace ARIT_Hackathon.Controllers
             {
                 return Ok(new ApiCommonResponse<user_login>() { allowStatus = false, msg = "Invalid Pan or OTP!", showMsg = true });
             }
-            else if (userLogin != null && userLogin.expirey_dt != null && userLogin.expirey_dt < DateTime.Now)
+            else if (userLogin != null && userLogin.expiry_dt != null && userLogin.expiry_dt < DateTime.Now)
             {
                 return Ok(new ApiCommonResponse<user_login>() { allowStatus = false, msg = "Password Expired, Kindly generate new OTP", showMsg = true });
             }
@@ -110,7 +110,7 @@ namespace ARIT_Hackathon.Controllers
 
             }
             Pan = Pan.ToUpper();
-            var userDetail = _context.user_details.AsNoTracking().Where(x => x.pan == Pan).FirstOrDefault();
+            var userDetail = _context.user_details.AsNoTracking().Where(x => x.pan == Pan && x.isactive==true).FirstOrDefault();
             if (userDetail == null)
             {
                 return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "You are not Registered!", showMsg = true });
@@ -131,7 +131,7 @@ namespace ARIT_Hackathon.Controllers
                 userLogin.otp = newOTP;
                 userLogin.modified_by = Pan;
                 userLogin.modified_dt = DateTime.Now;
-                userLogin.expirey_dt = DateTime.Now.AddMinutes(15);
+                userLogin.expiry_dt = DateTime.Now.AddMinutes(15);
                 userLogin.ip_address = HttpContext.Connection.RemoteIpAddress?.ToString();
                 _context.Entry(userLogin).State = EntityState.Modified;
                 _context.SaveChanges();
@@ -157,10 +157,10 @@ namespace ARIT_Hackathon.Controllers
                 userLogin.otp = newOTP;
                 userLogin.created_by = Pan;
                 userLogin.created_dt = DateTime.Now;
-                userLogin.expirey_dt = DateTime.Now.AddMinutes(15);
+                userLogin.expiry_dt = DateTime.Now.AddMinutes(15);
                 userLogin.device_name = DeviceName;
                 userLogin.ip_address = HttpContext.Connection.RemoteIpAddress?.ToString();
-
+                userLogin.user_id_ref = userDetail.transid;
                 _context.Add(userLogin);
                 _context.SaveChanges();
                 _context.Entry(userLogin).State = EntityState.Detached;
@@ -230,6 +230,7 @@ namespace ARIT_Hackathon.Controllers
                 {
                     ResMsg = "OTP sent to registered email/mobile";
                     _context.Add(user_Details);
+                    _context.SaveChanges();
                     _context.Entry(user_Details).State = EntityState.Detached;
                 }
                 else
@@ -241,7 +242,7 @@ namespace ARIT_Hackathon.Controllers
                 userLogin.otp = newOTP;
                 userLogin.created_by = user_Details.pan;
                 userLogin.created_dt = DateTime.Now;
-                userLogin.expirey_dt = DateTime.Now.AddMinutes(15);
+                userLogin.expiry_dt = DateTime.Now.AddMinutes(15);
                 userLogin.device_name = regPayload.device_name;
                 userLogin.ip_address = HttpContext.Connection.RemoteIpAddress?.ToString();
 

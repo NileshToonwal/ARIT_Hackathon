@@ -140,7 +140,7 @@ public partial class RepositoryContext : DbContext
                 .HasDefaultValueSql("now()")
                 .HasColumnType("timestamp without time zone");
             entity.Property(e => e.device_name).HasMaxLength(100);
-            entity.Property(e => e.expirey_dt).HasColumnType("timestamp without time zone");
+            entity.Property(e => e.expiry_dt).HasColumnType("timestamp without time zone");
             entity.Property(e => e.ip_address).HasMaxLength(136);
             entity.Property(e => e.modified_by).HasMaxLength(20);
             entity.Property(e => e.modified_dt).HasColumnType("timestamp without time zone");
