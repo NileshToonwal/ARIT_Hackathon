@@ -12,7 +12,13 @@ public partial class RepositoryContext : DbContext
     {
     }
 
+    public virtual DbSet<category_master> category_master { get; set; }
+
     public virtual DbSet<cfg_codevalue> cfg_codevalue { get; set; }
+
+    public virtual DbSet<issue_detail> issue_detail { get; set; }
+
+    public virtual DbSet<issue_notes_detail> issue_notes_detail { get; set; }
 
     public virtual DbSet<user_details> user_details { get; set; }
 
@@ -20,6 +26,11 @@ public partial class RepositoryContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<category_master>(entity =>
+        {
+            entity.HasNoKey();
+        });
+
         modelBuilder.Entity<cfg_codevalue>(entity =>
         {
             entity.HasKey(e => e.codevalueid).HasName("cfg_codevalue_pkey");
@@ -38,6 +49,52 @@ public partial class RepositoryContext : DbContext
                 .IsRequired()
                 .HasDefaultValueSql("true");
             entity.Property(e => e.modifiedby).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<issue_detail>(entity =>
+        {
+            entity.HasKey(e => e.issue_id).HasName("issue_detail_pkey");
+
+            entity.Property(e => e.issue_id).UseIdentityAlwaysColumn();
+            entity.Property(e => e.category).HasMaxLength(200);
+            entity.Property(e => e.details).HasMaxLength(1500);
+            entity.Property(e => e.exchange).HasMaxLength(50);
+            entity.Property(e => e.filename).HasMaxLength(200);
+            entity.Property(e => e.fullname).HasMaxLength(30);
+            entity.Property(e => e.isactive)
+                .IsRequired()
+                .HasDefaultValueSql("true");
+            entity.Property(e => e.issue_by).HasMaxLength(50);
+            entity.Property(e => e.issue_created_dt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone");
+            entity.Property(e => e.mode).HasMaxLength(150);
+            entity.Property(e => e.modified_by).HasMaxLength(50);
+            entity.Property(e => e.modified_dt).HasColumnType("timestamp without time zone");
+            entity.Property(e => e.pan).HasMaxLength(10);
+            entity.Property(e => e.segment).HasMaxLength(50);
+            entity.Property(e => e.status).HasMaxLength(50);
+            entity.Property(e => e.subcategory).HasMaxLength(200);
+            entity.Property(e => e.summary).HasMaxLength(150);
+            entity.Property(e => e.targate_date).HasColumnType("timestamp without time zone");
+            entity.Property(e => e.ucc).HasMaxLength(10);
+        });
+
+        modelBuilder.Entity<issue_notes_detail>(entity =>
+        {
+            entity.HasKey(e => e.trans_id).HasName("issue_notes_detail_pkey");
+
+            entity.Property(e => e.trans_id).UseIdentityAlwaysColumn();
+            entity.Property(e => e.created_by).HasMaxLength(50);
+            entity.Property(e => e.created_dt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone");
+            entity.Property(e => e.filename).HasMaxLength(200);
+            entity.Property(e => e.isactive)
+                .IsRequired()
+                .HasDefaultValueSql("true");
+            entity.Property(e => e.modified_by).HasMaxLength(50);
+            entity.Property(e => e.modified_dt).HasColumnType("timestamp without time zone");
         });
 
         modelBuilder.Entity<user_details>(entity =>

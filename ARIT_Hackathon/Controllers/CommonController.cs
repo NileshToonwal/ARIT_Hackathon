@@ -260,5 +260,100 @@ namespace ARIT_Hackathon.Controllers
                 return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
             }
         }
+
+
+
+        [Route("RegisterIssue")]
+        [HttpPost]
+        public IActionResult RegisterIssue([FromBody] issue_detail payload)
+        {
+            try
+            {
+                payload.pan = (payload.pan ?? "").ToUpper();
+                if (payload == null)
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.pan) || payload.pan.Length != 10)
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Invalid Pan!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.ucc))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "UCC Required!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.fullname))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "FullName Required!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.summary))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Summary Required!", showMsg = true });
+
+                }
+                else if (string.IsNullOrWhiteSpace(payload.exchange))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Exchange Required!", showMsg = true });
+
+                }
+                else if (string.IsNullOrWhiteSpace(payload.segment))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Segment Required!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.category))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Category Required!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.subcategory))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Sub Category Required!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.details))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Details text Required!", showMsg = true });
+                }
+                else if (!string.IsNullOrWhiteSpace(payload.filename) && string.IsNullOrWhiteSpace(payload.filedata))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "File data is incorrect!", showMsg = true });
+                }
+                else if (string.IsNullOrWhiteSpace(payload.mode))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Mode Required!", showMsg = true });
+                }
+                
+
+                if (payload.user_id_ref==0 || !_context.user_details.AsNoTracking().Any(x=>x.transid== payload.user_id_ref && x.pan.ToUpper()==payload.pan))
+                {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Invalid user_id_ref!", showMsg = true });
+                }
+
+                if (payload.issue_id != 0 && !_context.issue_detail.AsNoTracking().Any(x => x.issue_id == payload.issue_id && x.pan != payload.pan)) {
+                    return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "issue_id is already registered on another pan!", showMsg = true });
+                }
+                payload.targate_date = (payload.targate_date ?? payload.targate_date.Value.AddDays(5));
+                payload.issue_by = payload.fullname;
+
+
+
+                if (payload.issue_id == 0) {
+                    _context.Add(payload);
+                    _context.SaveChanges();
+                    _context.Entry(payload).State = EntityState.Detached;
+                }
+                else {
+                    _context.Entry(payload).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    _context.Entry(payload).State = EntityState.Detached;
+                }
+                return  Ok(new ApiCommonResponse<issue_detail>() { allowStatus = true, msg = "Successfully issue registered!", showMsg = true , contentData= payload});
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
+                return Ok(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+            }
+        }
+
     }
 }

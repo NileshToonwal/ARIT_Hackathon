@@ -17,11 +17,22 @@ using NLog;
 namespace ARIT_Hackathon
 {
     public class Program
-    {        
+    {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             //ConfigureServices(builder.Services);
+
+            // Add CORS configuration            
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+            });
 
             LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             builder.Services.ConfigureLoggerService();
@@ -73,6 +84,15 @@ namespace ARIT_Hackathon
             app.UseStaticFiles();
             app.UseRouting();
 
+            // Configure CORS
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyHeader()
+                       .AllowAnyMethod();
+            });
+            
+            app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
