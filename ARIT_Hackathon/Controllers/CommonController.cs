@@ -252,7 +252,7 @@ namespace ARIT_Hackathon.Controllers
                 userLogin.expiry_dt = DateTime.Now.AddMinutes(15);
                 userLogin.device_name = regPayload.device_name;
                 userLogin.ip_address = HttpContext.Connection.RemoteIpAddress?.ToString();
-
+                userLogin.user_id_ref = user_Details.transid;
                 _context.Add(userLogin);
                 _context.SaveChanges();
                 _context.Entry(userLogin).State = EntityState.Detached;
