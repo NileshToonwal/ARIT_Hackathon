@@ -504,27 +504,27 @@ namespace ARIT_Hackathon.Controllers
         }
 
 
-        [Route("GetUserDetailes/{Pan}")]
+        [Route("GetUserDetailesByPan/{Pan}")]
         [HttpGet]
-        public IActionResult GetUserDetailes(string Pan)
+        public IActionResult GetUserDetailesByPan(string Pan)
         {
             try
             {
                 if(Pan == null || !IsRegexMatch(Pan, CodeValueContrant.PanRegex))
                 {
-                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
+                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
                 }
                 else
                 {
-                    var data= _context.user_details.AsNoTracking().Where(x=>x.pan == Pan).FirstOrDefault();
+                    var data= _context.user_details.AsNoTracking().Where(x=>x.pan == Pan && x.isactive==true).FirstOrDefault();
 
                     if(data == null)
                     {
-                        return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "Details not found!", showMsg = true });
+                        return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Details not found!", showMsg = true });
                     }
                     else
                     {
-                        return Ok(new ApiCommonResponse<string>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true });
+                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true });
                     }
                 }
 
@@ -532,11 +532,43 @@ namespace ARIT_Hackathon.Controllers
             catch (Exception ex)
             {
                 _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
-                return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+                return Ok(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
                 
             }
 
         }
+
+
+
+        [Route("GetUserDetailesById/{userid}")]
+        [HttpGet]
+        public IActionResult GetUserDetailesById(long userid)
+        {
+            try
+            {
+                
+                    var data = _context.user_details.AsNoTracking().Where(x => x.transid == userid && x.isactive == true).FirstOrDefault();
+
+                    if (data == null)
+                    {
+                        return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Details not found!", showMsg = true });
+                    }
+                    else
+                    {
+                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true });
+                    }
+                
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
+                return Ok(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+
+            }
+
+        }
+
 
         [NonAction]
         public bool IsRegexMatch(string pan,string pattern) 
