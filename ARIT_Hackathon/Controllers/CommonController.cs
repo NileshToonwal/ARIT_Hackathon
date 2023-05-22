@@ -70,15 +70,20 @@ namespace ARIT_Hackathon.Controllers
             return Ok(new ApiCommonResponse<user_login>() { allowStatus = true, msg = "You are successfully logged in", showMsg = false, contentData = userLogin });
         }
 
+        [NonAction]
         public static string GenerateOTP()
         {
             int otp = random.Next(100000, 999999);
             return Convert.ToString(otp);
         }
+        
+        [NonAction]
         public bool sendOTPMailSms(string email, string mobile, string OTP)
         {
             return true;
         }
+
+        [NonAction]
         public static void UpdateStringPropertiesToUppercase(object model)
         {
             if (model == null)
