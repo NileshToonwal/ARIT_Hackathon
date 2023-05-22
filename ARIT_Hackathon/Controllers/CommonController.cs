@@ -176,7 +176,7 @@ namespace ARIT_Hackathon.Controllers
         }
 
         [Route("RegisterUserLoginData")]
-        [HttpPost]
+        [HttpPost]        
         public ApiCommonResponse<user_details> RegisterUserLoginData([FromBody] Registration regPayload)
         {
             try

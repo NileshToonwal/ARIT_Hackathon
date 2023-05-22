@@ -17,6 +17,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle;
 using NLog;
+using FluentValidation.AspNetCore;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
+using System.ComponentModel.DataAnnotations;
 
 namespace ARIT_Hackathon
 {
@@ -43,7 +48,7 @@ namespace ARIT_Hackathon
             LogManager.Configuration.Variables["LogsDirPath"] = "c:/";
 
             builder.Services.ConfigureSqlContext(builder.Configuration);
-            
+
 
             builder.Services.ConfigureRepositoryWrapper();
             builder.Services.Configure<TokenManagement>(builder.Configuration.GetSection("tokenManagement"));
@@ -71,13 +76,30 @@ namespace ARIT_Hackathon
 
             builder.Services.AddScoped<IAuthenticateService, TokenAuthenticationService>();
 
-            
+
 
 
             // Add services to the container.
 
             builder.Services.AddControllersWithViews();
-            builder.Services.AddControllers();
+            //builder.Services.AddControllers();
+            //builder.Services.AddControllers().AddJsonOptions(options =>
+            //    {
+            //        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            //    });
+
+            //builder.Services.AddMvc(options =>
+            //{
+            //    options.Filters.Add(typeof(CustomValidationAttribute));
+            //}).AddFluentValidation(fvc => fvc.RegisterValidatorsFromAssemblyContaining<AnyValidatorClass>());
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+            //builder.Services.AddControllers().AddFluentValidation(opt => { 
+            //    opt.RegisterValidatorsFromAssemblyContaining(typeof(Userva))
+            //});
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -107,15 +129,15 @@ namespace ARIT_Hackathon
                        .AllowAnyHeader()
                        .AllowAnyMethod();
             });
-            
+
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller}/{action=Index}/{id?}");
 
-            app.MapFallbackToFile("index.html");    
-            
+            app.MapFallbackToFile("index.html");
+
             app.Run();
         }
 
