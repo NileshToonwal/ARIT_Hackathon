@@ -524,7 +524,7 @@ namespace ARIT_Hackathon.Controllers
                     }
                     else
                     {
-                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true });
+                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true ,contentData=data});
                     }
                 }
 
@@ -555,7 +555,7 @@ namespace ARIT_Hackathon.Controllers
                     }
                     else
                     {
-                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true });
+                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true, contentData=data });
                     }
                 
 
