@@ -14,6 +14,7 @@ namespace Entities.ExtendedModels
         public string msg { get; set; }
         public T? contentData { get; set; }
         public bool isContentEncryted { get; set; }
+        public string encryptedContentData { get; set; }
 
     }
     public class Registration
