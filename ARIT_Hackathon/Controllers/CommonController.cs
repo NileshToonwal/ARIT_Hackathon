@@ -24,7 +24,7 @@ namespace ARIT_Hackathon.Controllers
         private IRepositoryWrapper _repoWrapper;
         private RepositoryContext _context;
         private static readonly Random random = new Random();
-        
+
 
         public CommonController(ILoggerManager logger, IRepositoryWrapper repoWrapper, RepositoryContext context)
         {
@@ -76,7 +76,7 @@ namespace ARIT_Hackathon.Controllers
             int otp = random.Next(100000, 999999);
             return Convert.ToString(otp);
         }
-        
+
         [NonAction]
         public bool sendOTPMailSms(string email, string mobile, string OTP)
         {
@@ -117,7 +117,7 @@ namespace ARIT_Hackathon.Controllers
 
             }
             Pan = Pan.ToUpper();
-            var userDetail = _context.user_details.AsNoTracking().Where(x => x.pan == Pan && x.isactive==true).FirstOrDefault();
+            var userDetail = _context.user_details.AsNoTracking().Where(x => x.pan == Pan && x.isactive == true).FirstOrDefault();
             if (userDetail == null)
             {
                 return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "You are not Registered!", showMsg = true });
@@ -176,7 +176,7 @@ namespace ARIT_Hackathon.Controllers
         }
 
         [Route("RegisterUserLoginData")]
-        [HttpPost]        
+        [HttpPost]
         public ApiCommonResponse<user_details> RegisterUserLoginData([FromBody] Registration regPayload)
         {
             try
@@ -187,7 +187,7 @@ namespace ARIT_Hackathon.Controllers
                     return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Data!", showMsg = true };
 
                 }
-                else if (string.IsNullOrWhiteSpace(user_Details.pan) || user_Details.pan.Length != 10 || !IsRegexMatch(user_Details.pan,CodeValueContrant.PanRegex))
+                else if (string.IsNullOrWhiteSpace(user_Details.pan) || user_Details.pan.Length != 10 || !IsRegexMatch(user_Details.pan, CodeValueContrant.PanRegex))
                 {
                     return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Pan!", showMsg = true };
 
@@ -207,12 +207,12 @@ namespace ARIT_Hackathon.Controllers
                     return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "DOB Required!", showMsg = true };
 
                 }
-                else if (string.IsNullOrWhiteSpace(user_Details.email) || !IsRegexMatch(user_Details.email,CodeValueContrant.EmailRegex))
+                else if (string.IsNullOrWhiteSpace(user_Details.email) || !IsRegexMatch(user_Details.email, CodeValueContrant.EmailRegex))
                 {
                     return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Email Required!", showMsg = true };
 
                 }
-                else if (string.IsNullOrWhiteSpace(user_Details.mobile))
+                else if (string.IsNullOrWhiteSpace(user_Details.mobile) || user_Details.mobile.Length != 10)
                 {
                     return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Mobile No Required!", showMsg = true };
                 }
@@ -363,7 +363,7 @@ namespace ARIT_Hackathon.Controllers
             catch (Exception ex)
             {
                 _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
-                return Ok(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+                return Ok(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = ex.Message, showMsg = true });
             }
         }
 
@@ -510,30 +510,30 @@ namespace ARIT_Hackathon.Controllers
         {
             try
             {
-                if(Pan == null || !IsRegexMatch(Pan, CodeValueContrant.PanRegex))
+                if (Pan == null || !IsRegexMatch(Pan, CodeValueContrant.PanRegex))
                 {
                     return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
                 }
                 else
                 {
-                    var data= _context.user_details.AsNoTracking().Where(x=>x.pan == Pan && x.isactive==true).FirstOrDefault();
+                    var data = _context.user_details.AsNoTracking().Where(x => x.pan == Pan && x.isactive == true).FirstOrDefault();
 
-                    if(data == null)
+                    if (data == null)
                     {
                         return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Details not found!", showMsg = true });
                     }
                     else
                     {
-                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true ,contentData=data});
+                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true, contentData = data });
                     }
                 }
 
-             }
+            }
             catch (Exception ex)
             {
                 _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
                 return Ok(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
-                
+
             }
 
         }
@@ -546,18 +546,18 @@ namespace ARIT_Hackathon.Controllers
         {
             try
             {
-                
-                    var data = _context.user_details.AsNoTracking().Where(x => x.transid == userid && x.isactive == true).FirstOrDefault();
 
-                    if (data == null)
-                    {
-                        return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Details not found!", showMsg = true });
-                    }
-                    else
-                    {
-                        return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true, contentData=data });
-                    }
-                
+                var data = _context.user_details.AsNoTracking().Where(x => x.transid == userid && x.isactive == true).FirstOrDefault();
+
+                if (data == null)
+                {
+                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Details not found!", showMsg = true });
+                }
+                else
+                {
+                    return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true, contentData = data });
+                }
+
 
             }
             catch (Exception ex)
@@ -572,8 +572,8 @@ namespace ARIT_Hackathon.Controllers
 
 
         [NonAction]
-        public bool IsRegexMatch(string pan,string pattern) 
-        {            
+        public bool IsRegexMatch(string pan, string pattern)
+        {
             Regex regex = new Regex(pattern);
             if (regex.IsMatch(pan))
             {
