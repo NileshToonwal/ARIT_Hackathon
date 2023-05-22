@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System.Linq;
 using System.Collections.Generic;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.RegularExpressions;
 
 namespace ARIT_Hackathon.Controllers
 {
@@ -23,6 +24,7 @@ namespace ARIT_Hackathon.Controllers
         private IRepositoryWrapper _repoWrapper;
         private RepositoryContext _context;
         private static readonly Random random = new Random();
+        
 
         public CommonController(ILoggerManager logger, IRepositoryWrapper repoWrapper, RepositoryContext context)
         {
@@ -45,7 +47,7 @@ namespace ARIT_Hackathon.Controllers
         [HttpGet]
         public IActionResult GetOtpLogin(string Pan, string OTP)
         {
-            if (string.IsNullOrWhiteSpace(Pan) || string.IsNullOrWhiteSpace(OTP) || Pan.Length != 10)
+            if (string.IsNullOrWhiteSpace(Pan) || string.IsNullOrWhiteSpace(OTP) || Pan.Length != 10 || !IsRegexMatch(Pan, CodeValueContrant.PanRegex))
             {
                 return BadRequest(new ApiCommonResponse<user_login>() { allowStatus = false, msg = "Invalid Pan or OTP!", showMsg = true });
 
@@ -104,7 +106,7 @@ namespace ARIT_Hackathon.Controllers
         [HttpGet]
         public IActionResult GenerateNewOtpLogin(string Pan, string DeviceName = "MOBILE")
         {
-            if (string.IsNullOrWhiteSpace(Pan) || Pan.Length != 10)
+            if (string.IsNullOrWhiteSpace(Pan) || Pan.Length != 10 || !IsRegexMatch(Pan, CodeValueContrant.PanRegex))
             {
                 return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "Invalid Pan!", showMsg = true });
 
@@ -180,7 +182,7 @@ namespace ARIT_Hackathon.Controllers
                     return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
 
                 }
-                else if (string.IsNullOrWhiteSpace(user_Details.pan) || user_Details.pan.Length != 10)
+                else if (string.IsNullOrWhiteSpace(user_Details.pan) || user_Details.pan.Length != 10 || !IsRegexMatch(user_Details.pan,CodeValueContrant.PanRegex))
                 {
                     return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Pan!", showMsg = true });
 
@@ -200,7 +202,7 @@ namespace ARIT_Hackathon.Controllers
                     return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "DOB Required!", showMsg = true });
 
                 }
-                else if (string.IsNullOrWhiteSpace(user_Details.email))
+                else if (string.IsNullOrWhiteSpace(user_Details.email) || !IsRegexMatch(user_Details.email,CodeValueContrant.EmailRegex))
                 {
                     return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Email Required!", showMsg = true });
 
@@ -276,7 +278,7 @@ namespace ARIT_Hackathon.Controllers
                 {
                     return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
                 }
-                else if (string.IsNullOrWhiteSpace(payload.pan) || payload.pan.Length != 10)
+                else if (string.IsNullOrWhiteSpace(payload.pan) || payload.pan.Length != 10 || !IsRegexMatch(payload.pan, CodeValueContrant.PanRegex))
                 {
                     return BadRequest(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Invalid Pan!", showMsg = true });
                 }
@@ -495,5 +497,55 @@ namespace ARIT_Hackathon.Controllers
                 return Ok(new ApiCommonResponse<issue_detail>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
             }
         }
+
+
+        [Route("GetUserDetailes/{Pan}")]
+        [HttpGet]
+        public IActionResult GetUserDetailes(string Pan)
+        {
+            try
+            {
+                if(Pan == null || !IsRegexMatch(Pan, CodeValueContrant.PanRegex))
+                {
+                    return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
+                }
+                else
+                {
+                    var data= _context.user_details.AsNoTracking().Where(x=>x.pan == Pan).FirstOrDefault();
+
+                    if(data == null)
+                    {
+                        return BadRequest(new ApiCommonResponse<string>() { allowStatus = false, msg = "Details not found!", showMsg = true });
+                    }
+                    else
+                    {
+                        return Ok(new ApiCommonResponse<string>() { allowStatus = true, msg = "User details Get Successful!", showMsg = true });
+                    }
+                }
+
+             }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error in RegisterIssue " + JsonConvert.SerializeObject(ex));
+                return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+                
+            }
+
+        }
+
+        [NonAction]
+        public bool IsRegexMatch(string pan,string pattern) 
+        {            
+            Regex regex = new Regex(pattern);
+            if (regex.IsMatch(pan))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

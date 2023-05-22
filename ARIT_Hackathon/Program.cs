@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle;
 using NLog;
 
 namespace ARIT_Hackathon
@@ -42,6 +43,7 @@ namespace ARIT_Hackathon
             LogManager.Configuration.Variables["LogsDirPath"] = "c:/";
 
             builder.Services.ConfigureSqlContext(builder.Configuration);
+            
 
             builder.Services.ConfigureRepositoryWrapper();
             builder.Services.Configure<TokenManagement>(builder.Configuration.GetSection("tokenManagement"));
@@ -69,10 +71,16 @@ namespace ARIT_Hackathon
 
             builder.Services.AddScoped<IAuthenticateService, TokenAuthenticationService>();
 
+            
+
 
             // Add services to the container.
 
             builder.Services.AddControllersWithViews();
+            builder.Services.AddControllers();
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
@@ -81,6 +89,11 @@ namespace ARIT_Hackathon
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sample API");
+                });
             }
 
             app.UseHttpsRedirection();
@@ -101,8 +114,8 @@ namespace ARIT_Hackathon
                 name: "default",
                 pattern: "{controller}/{action=Index}/{id?}");
 
-            app.MapFallbackToFile("index.html");
-
+            app.MapFallbackToFile("index.html");    
+            
             app.Run();
         }
 
