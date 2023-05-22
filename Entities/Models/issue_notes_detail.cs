@@ -17,7 +17,7 @@ public partial class issue_notes_detail
 
     public string? filedata { get; set; }
 
-    public string created_by { get; set; } = null!;
+    public string created_by { get; set; } 
 
     public DateTime created_dt { get; set; }
 

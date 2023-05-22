@@ -9,35 +9,35 @@ public partial class issue_detail
 
     public long user_id_ref { get; set; }
 
-    public string summary { get; set; } = null!;
+    public string summary { get; set; } 
 
-    public string pan { get; set; } = null!;
+    public string pan { get; set; } 
 
-    public string fullname { get; set; } = null!;
+    public string fullname { get; set; } 
 
-    public string ucc { get; set; } = null!;
+    public string ucc { get; set; } 
 
-    public string mode { get; set; } = null!;
+    public string mode { get; set; } 
 
-    public string exchange { get; set; } = null!;
+    public string exchange { get; set; } 
 
-    public string segment { get; set; } = null!;
+    public string segment { get; set; } 
 
-    public string category { get; set; } = null!;
+    public string category { get; set; } 
 
-    public string subcategory { get; set; } = null!;
+    public string subcategory { get; set; } 
 
-    public string status { get; set; } = null!;
+    public string status { get; set; } 
 
     public DateTime? targate_date { get; set; }
 
-    public string details { get; set; } = null!;
+    public string details { get; set; } 
 
     public string? filename { get; set; }
 
     public string? filedata { get; set; }
 
-    public string issue_by { get; set; } = null!;
+    public string issue_by { get; set; } 
 
     public DateTime issue_created_dt { get; set; }
 

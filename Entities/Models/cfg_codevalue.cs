@@ -7,11 +7,11 @@ public partial class cfg_codevalue
 {
     public int codevalueid { get; set; }
 
-    public string codetype { get; set; } = null!;
+    public string codetype { get; set; } 
 
-    public string codevalue { get; set; } = null!;
+    public string codevalue { get; set; } 
 
-    public string codevaluedescription { get; set; } = null!;
+    public string codevaluedescription { get; set; } 
 
     public short displaysequence { get; set; }
 
@@ -21,7 +21,7 @@ public partial class cfg_codevalue
 
     public string? additionalinfo { get; set; }
 
-    public string createdby { get; set; } = null!;
+    public string createdby { get; set; } 
 
     public DateTime createddate { get; set; }
 

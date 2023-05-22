@@ -177,53 +177,53 @@ namespace ARIT_Hackathon.Controllers
 
         [Route("RegisterUserLoginData")]
         [HttpPost]
-        public IActionResult RegisterUserLoginData([FromBody] Registration regPayload)
+        public ApiCommonResponse<user_details> RegisterUserLoginData([FromBody] Registration regPayload)
         {
             try
             {
                 user_details user_Details = regPayload.userdetails;
                 if (regPayload == null || user_Details == null)
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Data!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Data!", showMsg = true };
 
                 }
                 else if (string.IsNullOrWhiteSpace(user_Details.pan) || user_Details.pan.Length != 10 || !IsRegexMatch(user_Details.pan,CodeValueContrant.PanRegex))
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Pan!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Invalid Pan!", showMsg = true };
 
                 }
                 else if (string.IsNullOrWhiteSpace(user_Details.ucc))
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "UCC Required!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "UCC Required!", showMsg = true };
 
                 }
                 else if (string.IsNullOrWhiteSpace(user_Details.fullname))
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "FullName Required!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "FullName Required!", showMsg = true };
 
                 }
                 else if (user_Details.dob == null)
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "DOB Required!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "DOB Required!", showMsg = true };
 
                 }
                 else if (string.IsNullOrWhiteSpace(user_Details.email) || !IsRegexMatch(user_Details.email,CodeValueContrant.EmailRegex))
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Email Required!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Email Required!", showMsg = true };
 
                 }
                 else if (string.IsNullOrWhiteSpace(user_Details.mobile))
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Mobile No Required!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Mobile No Required!", showMsg = true };
                 }
                 else if (string.IsNullOrWhiteSpace(regPayload.device_name))
                 {
-                    return BadRequest(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Device Name is Required!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Device Name is Required!", showMsg = true };
                 }
 
                 if (_context.user_details.AsNoTracking().Any(x => x.pan == user_Details.pan.ToUpper()))
                 {
-                    return Ok(new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Already Registered!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Already Registered!", showMsg = true };
                 }
                 UpdateStringPropertiesToUppercase(user_Details);
 
@@ -242,7 +242,7 @@ namespace ARIT_Hackathon.Controllers
                 }
                 else
                 {
-                    return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "Registration Failed due to Sent OTP on EMAIL/Mobile", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Registration Failed due to Sent OTP on EMAIL/Mobile", showMsg = true };
                 }
                 userLogin.roletype = user_Details.roletype;
                 userLogin.pan = user_Details.pan;
@@ -258,17 +258,17 @@ namespace ARIT_Hackathon.Controllers
                 _context.Entry(userLogin).State = EntityState.Detached;
                 if (_context.user_details.AsNoTracking().Any(x => x.pan == user_Details.pan.ToUpper()))
                 {
-                    return Ok(new ApiCommonResponse<user_details>() { allowStatus = true, msg = "Welcome to Grievance, OTP has been sent to your Registered Email/Mobile", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = true, msg = "Welcome to Grievance, OTP has been sent to your Registered Email/Mobile", showMsg = true };
                 }
                 else
                 {
-                    return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+                    return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true };
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error in RegisterUserLoginData " + JsonConvert.SerializeObject(ex));
-                return Ok(new ApiCommonResponse<string>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true });
+                return new ApiCommonResponse<user_details>() { allowStatus = false, msg = "Something Went Wrong!", showMsg = true };
             }
         }
 
