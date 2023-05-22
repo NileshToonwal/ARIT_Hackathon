@@ -570,6 +570,7 @@ namespace ARIT_Hackathon.Controllers
         }
 
 
+
         [NonAction]
         public bool IsRegexMatch(string pan,string pattern) 
         {            
@@ -584,5 +585,22 @@ namespace ARIT_Hackathon.Controllers
             }
         }
 
+        [Route("catrgoryItem")]
+        [HttpGet]
+        public IActionResult GetListofCatrgoy()
+        {
+
+            var data = _context.category_master.ToList();
+
+            if (data == null)
+            {
+                return Ok(new ApiCommonResponse<List<category_master>>() { allowStatus = false, msg = "No records found!", showMsg = true });
+            }
+            else
+            {
+                return Ok(new ApiCommonResponse<List<category_master>>() { allowStatus = true, contentData = data, showMsg = false });
+            }
+
+        }
     }
 }
