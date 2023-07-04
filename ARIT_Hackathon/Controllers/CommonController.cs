@@ -50,7 +50,6 @@ namespace ARIT_Hackathon.Controllers
             if (string.IsNullOrWhiteSpace(Pan) || string.IsNullOrWhiteSpace(OTP) || Pan.Length != 10 || !IsRegexMatch(Pan, CodeValueContrant.PanRegex))
             {
                 return BadRequest(new ApiCommonResponse<user_login>() { allowStatus = false, msg = "Invalid Pan or OTP!", showMsg = true });
-
             }
             Pan = Pan.ToUpper();
             var userDetail = _context.user_details.AsNoTracking().Where(x => x.pan == Pan).FirstOrDefault();
@@ -275,7 +274,7 @@ namespace ARIT_Hackathon.Controllers
         [Route("RegisterIssue")]
         [HttpPost]
         public IActionResult RegisterIssue([FromBody] issue_detail payload)
-        {
+        {            
             try
             {
                 payload.pan = (payload.pan ?? "").ToUpper();

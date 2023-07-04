@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Builder;
 
-namespace ARIT_Hackathon.Extentions
+namespace ARIT_Hackathon.Extensions
 {
     public static class ServiceExtensions
     {

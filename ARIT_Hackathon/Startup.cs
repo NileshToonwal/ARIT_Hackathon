@@ -1,11 +1,10 @@
-﻿using ARIT_Hackathon.Extentions;
+﻿using ARIT_Hackathon.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using System.Text;
 //using Microsoft.AspNetCore.SpaServices.AngularCli;
-using ARIT_Hackathon.Extensions;
 
 namespace ARIT_Hackathon
 {
